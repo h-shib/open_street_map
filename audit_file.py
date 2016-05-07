@@ -4,17 +4,17 @@ import xml.etree.cElementTree as ET
 import pprint
 
 
-def audit_postal_code(filename):
-    """Return list of name and count of postal codes."""
-    postal_codes = {}
+def audit_tag_key(filename, tag_key):
+    """Return list of name and count of tag_key."""
+    lists = {}
     for _, element in ET.iterparse(filename):
         if element.tag == "tag":
-            if "postcode" in element.attrib["k"]:
-                if element.attrib["v"] not in postal_codes:
-                    postal_codes[element.attrib["v"]] = 1
+            if tag_key in element.attrib["k"]:
+                if element.attrib["v"] not in lists:
+                    lists[element.attrib["v"]] = 1
                 else:
-                    postal_codes[element.attrib["v"]] += 1
-    return postal_codes
+                    lists[element.attrib["v"]] += 1
+    return lists
 
 
 def audit_way(filename):
@@ -65,9 +65,9 @@ def audit_member(filename):
     return members
 
 def audit():
-    postal_codes = audit_postal_code('sendai_japan_sample.osm')
-    pprint.pprint(postal_codes)
-    print len(postal_codes)
+    lists = audit_tag_key('../sendai_japan.osm', 'postcode')
+    pprint.pprint(lists)
+    print len(lists)
 
 
 if __name__ == "__main__":
