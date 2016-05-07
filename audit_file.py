@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import xml.etree.cElementTree as ET
 import pprint
+import re
 
 
 def audit_tag_key(filename, tag_key):
@@ -10,6 +11,21 @@ def audit_tag_key(filename, tag_key):
     for _, element in ET.iterparse(filename):
         if element.tag == "tag":
             if tag_key in element.attrib["k"]:
+                if element.attrib["v"] not in lists:
+                    lists[element.attrib["v"]] = 1
+                else:
+                    lists[element.attrib["v"]] += 1
+    return lists
+
+
+def audit_phone_number(filename):
+    """Return phone nunbers doesn't match fotmat."""
+    lists = {}
+    phone_fomat = re.compile(r'^\+81-\d{2,3}-\d{2,3}-\d{4}$')
+
+    for _, element in ET.iterparse(filename):
+        if element.tag == "tag":
+            if "phone" in element.attrib["k"] and not phone_fomat.match(element.attrib["v"]):
                 if element.attrib["v"] not in lists:
                     lists[element.attrib["v"]] = 1
                 else:
@@ -65,7 +81,7 @@ def audit_member(filename):
     return members
 
 def audit():
-    lists = audit_tag_key('../sendai_japan.osm', 'postcode')
+    lists = audit_phone_number('../sendai_japan.osm')
     pprint.pprint(lists)
     print len(lists)
 
