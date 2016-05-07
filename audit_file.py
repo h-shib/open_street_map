@@ -3,8 +3,9 @@
 import xml.etree.cElementTree as ET
 import pprint
 
-# count each postal code
+
 def audit_postal_code(filename):
+    """Return list of name and count of postal codes."""
     postal_codes = {}
     for _, element in ET.iterparse(filename):
         if element.tag == "tag":
@@ -17,6 +18,7 @@ def audit_postal_code(filename):
 
 
 def audit_way(filename):
+    """Return list of name and count of ways."""
     ways = {}
     for _, element in ET.iterparse(filename):
         if element.tag == "way":
@@ -29,6 +31,7 @@ def audit_way(filename):
 
 
 def audit_user(filename):
+    """Return list of name and count of users."""
     users = {}
     for _, element in ET.iterparse(filename):
         if "user" in element.attrib:
@@ -40,6 +43,7 @@ def audit_user(filename):
 
 
 def audit_tag(filename):
+    """Return list of tag and count."""
     tags = {}
     for _, element in ET.iterparse(filename):
         if element.tag not in tags:
@@ -50,6 +54,7 @@ def audit_tag(filename):
 
 
 def audit_member(filename):
+    """Return list of name and count of members."""
     members = {}
     for _, element in ET.iterparse(filename):
         if element.tag == "member":
@@ -60,11 +65,7 @@ def audit_member(filename):
     return members
 
 def audit():
-    postal_codes = audit_postal_code('sendai_japan.osm')
-    #ways = audit_way('sendai_japan.osm')
-    #users = audit_user('sendai_japan.osm')
-    #tags = audit_tag('sendai_japan.osm')
-    #members = audit_member('sendai_japan.osm')
+    postal_codes = audit_postal_code('sendai_japan_sample.osm')
     pprint.pprint(postal_codes)
     print len(postal_codes)
 

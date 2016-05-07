@@ -6,43 +6,46 @@ import re
 import codecs
 import json
 
-lower = re.compile(r'^([a-z]|_)*$')
-lower_colon = re.compile(r'^([a-z]|_)*:([a-z]|_)*$')
-problemchars = re.compile(r'[=\+/&<>;\'"\?%#$@\,\. \t\r\n]')
 
+problemchars = re.compile(r'[=\+/&<>;\'"\?%#$@\,\. \t\r\n]')
 CREATED = ["version", "changeset", "timestamp", "user", "uid"]
 
 
-def set_pos(node, element, a):
-    if 'pos' not in node:
-        node['pos'] = [0, 0]
-    if a == 'lat':
-        node['pos'][0] = float(element.attrib[a])
-    elif a == 'lon':
-        node['pos'][1] = float(element.attrib[a])
+def set_pos(node, element):
+    """Set position if lat and lon both presented."""
+    if 'lat' in element.attrib and 'lon' in element.attrib:
+        lat = float(element.attrib['lat'])
+        lon = float(element.attrib['lon'])
+        pos = [lat, lon]
+        node['pos'] = pos
     return node
 
 
 def update_value(key, value):
+    """Update postal code not to use hyphen."""
     if key == 'postcode':
         value = value.replace("-", "")
     return value
 
 
 def shape_element(element):
+    """Return reshaped node for mongodb json format."""
     node = {}
     if element.tag == "node" or element.tag == "way":
         node['type'] = element.tag
+        
         # for first level node
         for a in element.attrib:
             if a == 'lat' or a == 'lon':
-                node = set_pos(node, element, a)
+                if 'pos' not in node:
+                    node = set_pos(node, element)
             elif a in CREATED:
                 if 'created' not in node:
                     node['created'] = {}
                 node['created'][a] = element.attrib[a]
             else:
                 node[a] = element.attrib[a]
+        
         # for second level node
         for child in element.getchildren():
             if child.tag == 'nd':
@@ -79,4 +82,4 @@ def process_map(file_in, pretty = False):
     return data
 
 if __name__ == "__main__":
-    process_map('sendai_japan.osm', True)
+    process_map('sendai_japan_sample.osm', True)
